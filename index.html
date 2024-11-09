@@ -15,8 +15,26 @@
             background-color: #f9f9f9;
             display: none;
         }
+        /* 缩小图片的样式 */
+        #map-image {
+            width: 30%; /* 调整图片缩放比例 */
+            height: auto;
+        }
     </style>
     <script>
+
+        // 比例缩放的比例
+        const scale = 0.5; // 根据图片缩小的比例调整
+
+        function showInfo(info) {
+            // 获取提示框元素
+            const infoBox = document.getElementById("info-box");
+            // 设置提示框内容
+            infoBox.innerHTML = "<
+
+        // 比例缩放的比例
+        const scale = 0.3; // 根据图片缩小的比例调整
+
         function showInfo(info) {
             // 获取提示框元素
             const infoBox = document.getElementById("info-box");
@@ -26,32 +44,25 @@
             infoBox.style.display = "block";
         }
 
+
         function hideInfo() {
             // 隐藏提示框
             document.getElementById("info-box").style.display = "none";
         }
-        window.addEventListener('resize', function() {
 
+        // 自动调整区域坐标
+        function adjustCords(cords) {
+            return cords.split(',').map(coord => Math.round(coord * scale)).join(',');
+        }
 
-          var img = document.querySelector('img');
+        document.addEventListener("DOMContentLoaded", function() {
+            const areas = document.querySelectorAll("area");
+            areas.forEach(area => {
+                const originalCords = area.getAttribute("data-original-cords");
+                area.cords = adjustCords(originalCords);
+            });
+        });
 
-
-          var aspectRatio = img.naturalWidth / img.naturalHeight;
-
-
-          var containerWidth = img.parentElement.offsetWidth;
-
-
-          img.style.width = containerWidth + 'px';
-
-
-          img.style.height = (containerWidth / aspectRatio) + 'px';
-
-
-          });
-
-
-       window.dispatchEvent(new Event('resize'));
     </script>
 </head>
 <body>
