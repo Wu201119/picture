@@ -30,6 +30,28 @@
             // 隐藏提示框
             document.getElementById("info-box").style.display = "none";
         }
+        window.addEventListener('resize', function() {
+
+
+          var img = document.querySelector('img');
+
+
+          var aspectRatio = img.naturalWidth / img.naturalHeight;
+
+
+          var containerWidth = img.parentElement.offsetWidth;
+
+
+          img.style.width = containerWidth + 'px';
+
+
+          img.style.height = (containerWidth / aspectRatio) + 'px';
+
+
+          });
+
+
+       window.dispatchEvent(new Event('resize'));
     </script>
 </head>
 <body>
