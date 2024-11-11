@@ -7,29 +7,85 @@
         /* 提示框样式 */
         #info-box {
             position: absolute;
-            top: 50px;
-            right: 50px;
-            width: 200px;
             padding: 15px;
             border: 1px solid #333;
-            background-color: #f9f9f9;
+            background-color: rgba(249, 249, 249, 0.95); /* 半透明背景 */
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2); /* 阴影效果 */
             display: none;
+            width: 220px;
+            font-size: 14px;
+            color: #333;
         }
     </style>
     <script>
-        function showInfo(info) {
-            // 获取提示框元素
+        const linkInfo = {
+            "1-2": "1-2：距离47米、2个人行道且有停车且窄，单车道通行，绿化很少但沿街商业率高，导航推荐路线，可视度较高，居住密度较低。",
+            "2-4": "2-4：距离81米、2个人行道且有停车且窄，单车道通行，绿化很少但沿街商业率高，导航推荐路线，可视度较低，居住密度高。",
+            "1-3": "1-3：距离176米，1个人行道且有停车但宽敞，禁止车辆通行，绿化较少但沿街商业率高，导航不推荐路线，可视度一般，居住密度低。",
+            "2-5": "2-5：距离142米，2个人行道且有停车且窄，单车道通行，绿化很少但沿街商业率高，导航不推荐路线，可视度较高，居住密度低。",
+            "3-5": "3-5：距离62米，1个人行道且有停车但宽敞，禁止车辆通行，绿化较少但沿街商业率高，导航不推荐路线，天空可视度一般，居住区密度高。",
+            "3-6": "3-6：距离223米，1个人行道且有公共座椅但宽敞，禁止车辆通行，绿化较少但沿街商业率高，导航不推荐路线，天空可视度较高，居住区密度低。",
+            "4-10": "4-10：距离232米，2个人行道且有停车但宽敞，4车道，绿化、沿街商业率都较少，导航推荐路线，天空可视度较低，居住区密度高。",
+            "4-7": "4-7:距离124米，2个人行道且有停车，可2人行走，单车道通行，绿化很少但沿街商业率较高，导航不推荐路线，天空可视度较低，居住区密度较高。",
+            "5-7": "5-7：距离86米，2个人行道且有停车，仅一人通行，2个单向车道，绿化很少、沿街商业也较少，导航不推荐路线，天空可视度较高，居住区密度很低。",
+            "5-8": "5-8：距离218米，1个人行道且有停车和施工但宽敞，可2人并排行走，4车道，人绿化较多且沿街商业率高，导航不推荐路线，天空可视度较高，居住区密度低。",
+            "6-8": "6-8：距离71米，1个人行道且宽敞，，4车道，人绿化很少但沿街商业率高，导航不推荐路线，天空可视度很高，居住区密度低。",
+            "6-9": "6-9：距离184米，1个人行道且有公共座椅但宽敞，禁止车辆通行，绿化较少但沿街商业率高，导航不推荐路线，天空可视度较低，居住区密度低。",
+            "7-10": "7-10：距离141米，2个人行道且有停车但宽敞，单车道，绿化程度高但沿街商业率较低，导航不推荐路线，天空可视度很高，居住区密度高。",
+            "7-11": "7-11：距离205米，2个人行道且有停车、施工等因素但较宽敞，单车道，绿化很少但沿街商业率较高，导航不推荐路线，天空可视度较高，居住区密度高。",
+            "8-11": "8-11：距离77米，1个人行道且有停车但宽敞，4车道，绿化很少且沿街商业率低，导航不推荐路线，天空可视度较高，居住区密度低。",
+            "8-12": "8-12：距离112米，1个人行道且有停车，仅一人通行，3车道，绿化较高且沿街商业率高，导航不推荐路线，天空可视度很高，居住区密度低。",
+            "9-12": "9-12：距离146米，2个人行道且有停车但宽敞，单车道，绿化很少但沿街商业率高，导航不推荐路线，可视度较低，居住密度低。",
+            "9-15": "9-15：距离116米，1个人行道且有停车但宽敞，2个单向车道，绿化很少但沿街商业率高，导航不推荐路线，天空可视度较低，居住区密度较低。",
+            "9-16": "9-16：距离126米，1个人行道且有公共座椅但非常宽敞，禁止车辆通行，绿化较少但沿街商业率高，导航不推荐路线，天空可视度较低，居住区密度低。",
+            "11-13": "11-13：距离120米，2个人行道且有停车、施工等因素但较宽敞，2个单向车道，绿化较高且沿街商业率低，导航不推荐路线，天空可视度较低，居住区密度高。",
+            "10-13": "10-13：距离180米，1个人行道且有停车、公交站台等因素但较宽敞，4车道，绿化较高且沿街商业率低，导航推荐路线，天空可视度较高，居住区密度高。",
+            "11-14": "11-14：距离80米，2个人行道且有停车但较宽敞，单车道，绿化较少但沿街商业率较高，导航不推荐路线，天空可视度很低，居住区密度高。",
+            "12-14": "12-14：距离83米，1个人行道且较宽敞，4车道，绿化较高但沿街商业率很低，导航不推荐路线，天空可视度较高，居住区密度低。",
+            "12-15": "12-15：距离83米，1个人行道且有停车但较宽敞，3车道，绿化较低但沿街商业率很高，导航不推荐路线，天空可视度很低，居住区密度低。",
+            "13-17": "13-17：距离85米，1个人行道且较宽敞，4车道，绿化较高且沿街商业率低，导航推荐路线，天空可视度较高，居住区密度较高。",
+            "14-17": "14-17：距离125米，1个人行道且有停车但较宽敞，4车道，绿化很低且沿街商业率较低，导航不推荐路线，天空可视度较低，居住区密度高。",
+            "14-18": "14-18：距离129米，2个人行道且有停车但很宽敞，单车道，人绿化较少但沿街商业率较高，导航不推荐路线，天空可视度很低，居住区密度较低。",
+            "15-18": "15-18：距离70米，2个人行道且有停车但较宽敞，双车道，绿化很少但沿街商业率较高，导航不推荐路线，天空可视度较高，居住区密度低。",
+            "15-19": "15-19：距离135米，1个人行道且有停车且较窄，4车道，绿化很少但沿街商业率很高，导航不推荐路线，天空可视度很低，居住区密度较低。",
+            "16-19": "16-19：距离229米，2个人行道且有停车但较宽敞，单车道，绿化较少但沿街商业率很高，导航不推荐路线，天空可视度较高，居住区密度低。",
+            "16-25": "16-25：距离581米，1个人行道且有停车、公共座椅等因素但较宽敞，禁止车辆通行，绿化很少但沿街商业率高，导航不推荐路线，天空可视度较低，居住区密度较低。",
+            "17-20": "17-20：距离15米，1个人行道且较宽敞，4车道，绿化较高且沿街商业率较低，导航推荐路线，天空可视度较高，居住区密度高。",
+            "18-20": "18-20：距离136米，1个人行道且有停车但较宽敞，3车道，绿化很少但沿街商业率较高，导航不推荐路线，天空可视度很高，居住区密度高。",
+            "18-21": "18-21：距离133米，2个人行道且有停车但较宽敞，单车道，绿化很少但沿街商业率较高，导航不推荐路线，天空可视度较高，居住区密度较低。",
+            "19-21": "19-21：距离74米，2个人行道且有停车但较宽敞，单车道，绿化很少且沿街商业率较低，导航不推荐路线，天空可视度很低，居住区密度较低。",
+            "19-22": "19-22：距离99米，2个人行道且有停车且较窄，单车道，绿化较少但沿街商业率高，导航不推荐路线，天空可视度很低，居住区密度较低。",
+            "20-23": "20-23：距离124米，1个人行道且较宽敞，4车道，绿化较高且沿街商业率低，导航推荐路线，天空可视度较高，居住区密度高。",
+            "21-23": "21-23：距离156米，2个人行道且有停车且较窄，单车道，绿化很少且沿街商业率较低，导航不推荐路线，天空可视度较低，居住区密度较低。",
+            "21-24": "21-24：距离82米，2个人行道且有停车且较窄，单车道，绿化和沿街商业率较低，导航不推荐路线，天空可视度较高，居住区密度低。",
+            "22-24": "22-24：距离93米，2个人行道且有停车且窄，单车道，绿化很少且沿街商业率较低，导航不推荐路线，天空可视度很低，居住区密度较低。",
+            "22-25": "22-25：距离132米，1个人行道且有停车、公共站台等因素但较宽敞，4车道，绿化较高且沿街商业率高，导航不推荐路线，天空可视度低，居住区密度低。",
+            "23-26": "23-26：距离66米，1个人行道且较宽敞，4车道，绿化较高且沿街商业率较低，导航推荐路线，天空可视度较高，居住区密度低。",
+            "24-26": "24-26：距离158米，2个人行道且有停车但较宽敞，单车道，绿化较少但沿街商业率高，导航不推荐路线，天空可视度低，居住区密度较低。",
+            "25-27": "25-27：距离108米，1个人行道且非常宽敞，8车道，绿化高且沿街商业率低，导航不推荐路线，天空可视度较高，居住区密度低。",
+            "26-28": "26-28：距离59米，1个人行道且较宽敞，4车道，绿化较低且沿街商业率高，导航推荐路线，天空可视度较高，居住区密度低。",
+            "27-28": "27-28：距离198米，1个人行道且较宽敞，8车道，绿化高且沿街商业率高，导航不推荐路线，天空可视度较高，居住区密度低。",
+            "24-27": "24-27：距离126米，2个人行道且有停车、障碍物等因素且较窄，双车道，绿化较少但沿街商业率高，导航不推荐路线，天空可视度较高，居住区密度低。",
+
+        };
+
+        function showInfo(link, event) {
             const infoBox = document.getElementById("info-box");
-            // 设置提示框内容
-            infoBox.innerHTML = "<strong>link信息：</strong><br>" + info;
-            // 显示提示框
+            infoBox.innerHTML = "<strong>link信息：</strong><br>" + linkInfo[link];
             infoBox.style.display = "block";
+            infoBox.style.left = event.clientX + 10 + "px";
+            infoBox.style.top = event.clientY + 10 + "px";
         }
 
         function hideInfo() {
-            // 隐藏提示框
             document.getElementById("info-box").style.display = "none";
         }
+
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest("area")) {
+                hideInfo();
+            }
+        });
     </script>
 </head>
 <body>
@@ -40,53 +96,53 @@
     <img src="南京东路至来福士广场地图.jpg" usemap="#image-map">
 
     <map name="image-map">
-        <area target="" alt="1-2" title="1-2" href="javascript:void(0);" coords="425,26,433,26,426,71,420,67" shape="poly" onclick="showInfo('1-2：距离47米、2个人行道且有停车且窄，单车道通行，绿化很少但沿街商业率高，导航推荐路线，可视度较高，居住密度较低。');">
-        <area target="" alt="2-4" title="2-4" href="javascript:void(0);" coords="418,66,428,71,420,109,410,108" shape="poly" onclick="showInfo('2-4：距离81米、2个人行道且有停车且窄，单车道通行，绿化很少但沿街商业率高，导航推荐路线，可视度较低，居住密度高。');">
-        <area target="" alt="1-3" title="1-3" href="javascript:void(0);" coords="426,26,425,34,354,39,354,27" shape="poly" onclick="showInfo('1-3：距离176米，1个人行道且有停车但宽敞，禁止车辆通行，绿化较少但沿街商业率高，导航不推荐路线，可视度一般，居住密度低。');">
-        <area target="" alt="2-5" title="2-5" href="javascript:void(0);" coords="422,62,418,76,356,70,357,58" shape="poly" onclick="showInfo('2-5：距离142米，2个人行道且有停车且窄，单车道通行，绿化很少但沿街商业率高，导航不推荐路线，可视度较高，居住密度低。');">
-        <area target="" alt="3-5" title="3-5" href="javascript:void(0);" coords="350,28,358,28,359,66,350,66" shape="poly" onclick="showInfo('3-5：距离62米，1个人行道且有停车但宽敞，禁止车辆通行，绿化较少但沿街商业率高，导航不推荐路线，天空可视度一般，居住区密度高。');">
-        <area target="" alt="3-6" title="3-6" href="javascript:void(0);" coords="350,27,351,39,258,43,254,30" shape="poly" onclick="showInfo('3-6：距离223米，1个人行道且有公共座椅但宽敞，禁止车辆通行，绿化较少但沿街商业率高，导航不推荐路线，天空可视度较高，居住区密度低。 ');">
-        <area target="" alt="4-10" title="4-10" href="javascript:void(0);" coords="411,109,418,111,403,174,356,170,360,158,399,161" shape="poly" onclick="showInfo('4-10：距离232米，2个人行道且有停车但宽敞，4车道，绿化、沿街商业率都较少，导航推荐路线，天空可视度较低，居住区密度高。');">
-        <area target="" alt="4-7" title="4-7" href="javascript:void(0);" coords="420,112,421,103,358,98,356,107" shape="poly" onclick="showInfo('4-7：距离124米，2个人行道且有停车，可2人行走，单车道通行，绿化很少但沿街商业率较高，导航不推荐路线，天空可视度较低，居住区密度较高。');">
-        <area target="" alt="5-7" title="5-7" href="javascript:void(0);" coords="350,64,360,66,360,104,351,106" shape="poly" onclick="showInfo('5-7：距离86米，2个人行道且有停车，仅一人通行，2个单向车道，绿化很少、沿街商业也较少，导航不推荐路线，天空可视度较高，居住区密度很低。');">
-        <area target="" alt="5-8" title="5-8" href="javascript:void(0);" coords="353,61,353,72,260,79,260,67" shape="poly" onclick="showInfo('5-8：距离218米，1个人行道且有停车和施工但宽敞，可2人并排行走，4车道，人绿化较多且沿街商业率高，导航不推荐路线，天空可视度较高，居住区密度低。');">
-        <area target="" alt="6-8" title="6-8" href="javascript:void(0);" coords="248,34,256,30,262,75,254,76" shape="poly" onclick="showInfo('6-8：距离71米，1个人行道且宽敞，，4车道，人绿化很少但沿街商业率高，导航不推荐路线，天空可视度很高，居住区密度低。');">
-        <area target="" alt="6-9" title="6-9" href="javascript:void(0);" coords="251,31,250,42,174,27,173,12" shape="poly" onclick="showInfo('6-9：距离184米，1个人行道且有公共座椅但宽敞，禁止车辆通行，绿化较少但沿街商业率高，导航不推荐路线，天空可视度较低，居住区密度低。');">
-        <area target="" alt="7-10" title="7-10" href="javascript:void(0);" coords="350,102,359,103,363,171,354,172" shape="poly" onclick="showInfo('7-10：距离141米，2个人行道且有停车但宽敞，单车道，绿化程度高但沿街商业率较低，导航不推荐路线，天空可视度很高，居住区密度高。');">
-        <area target="" alt="7-11" title="7-11" href="javascript:void(0);" coords="352,98,354,110,264,112,264,102" shape="poly" onclick="showInfo('7-11：距离205米，2个人行道且有停车、施工等因素但较宽敞，单车道，绿化很少但沿街商业率较高，导航不推荐路线，天空可视度较高，居住区密度高。');">
-        <area target="" alt="8-11" title="8-11" href="javascript:void(0);" coords="254,72,263,73,269,109,259,109" shape="poly" onclick="showInfo('8-11：距离77米，1个人行道且有停车但宽敞，4车道，绿化很少且沿街商业率低，导航不推荐路线，天空可视度较高，居住区密度低。');">
-        <area target="" alt="8-12" title="8-12" href="javascript:void(0);" coords="258,68,258,78,209,79,207,70" shape="poly" onclick="showInfo('8-12：距离112米，1个人行道且有停车，仅一人通行，3车道，绿化较高且沿街商业率高，导航不推荐路线，天空可视度很高，居住区密度低。');">
-        <area target="" alt="9-12" title="9-12" href="javascript:void(0);" coords="174,15,165,14,202,76,214,72" shape="poly" onclick="showInfo('9-12：距离146米，2个人行道且有停车但宽敞，单车道，绿化很少但沿街商业率高，导航不推荐路线，可视度较低，居住密度低。');">
-        <area target="" alt="9-15" title="9-15" href="javascript:void(0);" coords="168,18,178,18,177,73,166,74" shape="poly" onclick="showInfo('9-15：距离116米，1个人行道且有停车但宽敞，2个单向车道，绿化很少但沿街商业率高，导航不推荐路线，天空可视度较低，居住区密度较低。');">
-        <area target="" alt="9-16" title="9-16" href="javascript:void(0);" coords="177,14,177,24,112,18,114,10" shape="poly" onclick="showInfo('9-16：距离126米，1个人行道且有公共座椅但非常宽敞，禁止车辆通行，绿化较少但沿街商业率高，导航不推荐路线，天空可视度较低，居住区密度低。');">
-        <area target="" alt="11-13" title="11-13" href="javascript:void(0);" coords="262,110,270,108,278,164,271,165" shape="poly" onclick="showInfo('11-13：距离120米，2个人行道且有停车、施工等因素但较宽敞，2个单向车道，绿化较高且沿街商业率低，导航不推荐路线，天空可视度较低，居住区密度高。');">
-        <area target="" alt="10-13" title="10-13" href="javascript:void(0);" coords="356,160,358,169,274,166,274,155" shape="poly" onclick="showInfo('10-13：距离180米，1个人行道且有停车、公交站台等因素但较宽敞，4车道，绿化较高且沿街商业率低，导航推荐路线，天空可视度较高，居住区密度高。');">
-        <area target="" alt="11-14" title="11-14" href="javascript:void(0);" coords="263,102,265,110,226,114,224,105" shape="poly" onclick="showInfo('11-14：距离80米，2个人行道且有停车但较宽敞，单车道，绿化较少但沿街商业率较高，导航不推荐路线，天空可视度很低，居住区密度高。');">
-        <area target="" alt="12-14" title="12-14" href="javascript:void(0);" coords="202,74,213,70,229,111,221,111" shape="poly" onclick="showInfo('12-14：距离83米，1个人行道且较宽敞，4车道，绿化较高但沿街商业率很低，导航不推荐路线，天空可视度较高，居住区密度低。');">
-        <area target="" alt="12-15" title="12-15" href="javascript:void(0);" coords="204,70,210,81,170,78,169,68" shape="poly" onclick="showInfo('12-15：距离83米，1个人行道且有停车但较宽敞，3车道，绿化较低但沿街商业率很高，导航不推荐路线，天空可视度很低，居住区密度低。');">
-        <area target="" alt="13-17" title="13-17" href="javascript:void(0);" coords="272,155,273,167,233,170,231,161" shape="poly" onclick="showInfo('13-17：距离85米，1个人行道且较宽敞，4车道，绿化较高且沿街商业率低，导航推荐路线，天空可视度较高，居住区密度较高。 ');">
-        <area target="" alt="14-17" title="14-17" href="javascript:void(0);" coords="219,111,229,110,239,166,230,168" shape="poly" onclick="showInfo('14-17：距离125米，1个人行道且有停车但较宽敞，4车道，绿化很低且沿街商业率较低，导航不推荐路线，天空可视度较低，居住区密度高。');">
-        <area target="" alt="14-18" title="14-18" href="javascript:void(0);" coords="222,104,225,116,166,111,166,100" shape="poly" onclick="showInfo('14-18：距离129米，2个人行道且有停车但很宽敞，单车道，人绿化较少但沿街商业率较高，导航不推荐路线，天空可视度很低，居住区密度较低。');">
-        <area target="" alt="15-18" title="15-18" href="javascript:void(0);" coords="165,67,174,69,174,109,164,108" shape="poly" onclick="showInfo('15-18：距离70米，2个人行道且有停车但较宽敞，双车道，绿化很少但沿街商业率较高，导航不推荐路线，天空可视度较高，居住区密度低。');">
-        <area target="" alt="15-19" title="15-19" href="javascript:void(0);" coords="167,67,169,78,111,70,109,57" shape="poly" onclick="showInfo('15-19：距离135米，1个人行道且有停车且较窄，4车道，绿化很少但沿街商业率很高，导航不推荐路线，天空可视度很低，居住区密度较低。');">
-        <area target="" alt="16-19" title="16-19" href="javascript:void(0);" coords="107,8,115,9,116,67,106,65" shape="poly" onclick="showInfo('16-19：距离229米，2个人行道且有停车但较宽敞，单车道，绿化较少但沿街商业率很高，导航不推荐路线，天空可视度较高，居住区密度低。');">
-        <area target="" alt="16-25" title="16-25" href="javascript:void(0);" coords="109,19,112,8,1,-1,1,53,10,54,10,12" shape="poly" onclick="showInfo('16-25：距离581米，1个人行道且有停车、公共座椅等因素但较宽敞，禁止车辆通行，绿化很少但沿街商业率高，导航不推荐路线，天空可视度较低，居住区密度较低。');">
-        <area target="" alt="17-20" title="17-20" href="javascript:void(0);" coords="229,159,232,169,167,170,168,160" shape="poly" onclick="showInfo('17-20：距离15米，1个人行道且较宽敞，4车道，绿化较高且沿街商业率较低，导航推荐路线，天空可视度较高，居住区密度高。');">
-        <area target="" alt="18-20" title="18-20" href="javascript:void(0);" coords="164,105,173,107,171,170,162,170" shape="poly" onclick="showInfo('18-20：距离136米，1个人行道且有停车但较宽敞，3车道，绿化很少但沿街商业率较高，导航不推荐路线，天空可视度很高，居住区密度高。');">
-        <area target="" alt="18-21" title="18-21" href="javascript:void(0);" coords="165,99,165,109,106,103,105,90" shape="poly" onclick="showInfo('18-21：距离133米，2个人行道且有停车但较宽敞，单车道，绿化很少但沿街商业率较高，导航不推荐路线，天空可视度较高，居住区密度较低。');">
-        <area target="" alt="19-21" title="19-21" href="javascript:void(0);" coords="103,58,112,59,111,102,104,101" shape="poly" onclick="showInfo('19-21：距离74米，2个人行道且有停车但较宽敞，单车道，绿化很少且沿街商业率较低，导航不推荐路线，天空可视度很低，居住区密度较低。');">
-        <area target="" alt="19-22" title="19-22" href="javascript:void(0);" coords="106,58,107,68,62,64,62,52" shape="poly" onclick="showInfo('19-22：距离99米，2个人行道且有停车且较窄，单车道，绿化较少但沿街商业率高，导航不推荐路线，天空可视度很低，居住区密度较低。');">
-        <area target="" alt="20-23" title="20-23" href="javascript:void(0);" coords="165,160,165,171,109,171,112,162" shape="poly" onclick="showInfo('20-23：距离124米，1个人行道且较宽敞，4车道，绿化较高且沿街商业率低，导航推荐路线，天空可视度较高，居住区密度高。 ');">
-        <area target="" alt="21-23" title="21-23" href="javascript:void(0);" coords="104,100,111,100,113,172,105,172" shape="poly" onclick="showInfo('21-23：距离156米，2个人行道且有停车且较窄，单车道，绿化很少且沿街商业率较低，导航不推荐路线，天空可视度较低，居住区密度较低。');">
-        <area target="" alt="21-24" title="21-24" href="javascript:void(0);" coords="107,92,106,103,72,104,69,93" shape="poly" onclick="showInfo('21-24：距离82米，2个人行道且有停车且较窄，单车道，绿化和沿街商业率较低，导航不推荐路线，天空可视度较高，居住区密度低。');">
-        <area target="" alt="22-24" title="22-24" href="javascript:void(0);" coords="60,53,69,55,75,102,67,103" shape="poly" onclick="showInfo('22-24：距离93米，2个人行道且有停车且窄，单车道，绿化很少且沿街商业率较低，导航不推荐路线，天空可视度很低，居住区密度较低。');">
-        <area target="" alt="22-25" title="22-25" href="javascript:void(0);" coords="62,53,64,62,3,58,2,48" shape="poly" onclick="showInfo('22-25：距离132米，1个人行道且有停车、公共站台等因素但较宽敞，4车道，绿化较高且沿街商业率高，导航不推荐路线，天空可视度低，居住区密度低。');">
-        <area target="" alt="23-26" title="23-26" href="javascript:void(0);" coords="109,170,109,163,80,163,81,172" shape="poly" onclick="showInfo('23-26：距离66米，1个人行道且较宽敞，4车道，绿化较高且沿街商业率较低，导航推荐路线，天空可视度较高，居住区密度低。');">
-        <area target="" alt="24-26" title="24-26" href="javascript:void(0);" coords="67,99,74,99,82,172,74,174" shape="poly" onclick="showInfo('24-26：距离158米，2个人行道且有停车但较宽敞，单车道，绿化较少但沿街商业率高，导航不推荐路线，天空可视度低，居住区密度较低。');">
-        <area target="" alt="25-27" title="25-27" href="javascript:void(0);" coords="1,52,10,53,14,102,6,102" shape="poly" onclick="showInfo('25-27：距离108米，1个人行道且非常宽敞，8车道，绿化高且沿街商业率低，导航不推荐路线，天空可视度较高，居住区密度低。');">
-        <area target="" alt="26-28" title="26-28" href="javascript:void(0);" coords="77,164,78,174,31,176,29,166" shape="poly" onclick="showInfo('26-28：距离59米，1个人行道且较宽敞，4车道，绿化较低且沿街商业率高，导航推荐路线，天空可视度较高，居住区密度低。');">
-        <area target="" alt="27-28" title="27-28" href="javascript:void(0);" coords="4,99,17,98,26,165,37,164,36,176,13,177" shape="poly" onclick="showInfo('27-28：距离198米，1个人行道且较宽敞，8车道，绿化高且沿街商业率高，导航不推荐路线，天空可视度较高，居住区密度低。 ');">
-        <area target="" alt="24-27" title="24-27" href="javascript:void(0);" coords="68,97,69,106,11,103,8,94" shape="poly" onclick="showInfo('24-27：距离126米，2个人行道且有停车、障碍物等因素且较窄，双车道，绿化较少但沿街商业率高，导航不推荐路线，天空可视度较高，居住区密度低');">
-</map>
+        <area  alt="1-2" title="1-2" href="javascript:void(0);" coords="425,26,433,26,426,71,420,67" shape="poly" onclick="showInfo('1-2', event);">
+        <area  alt="2-4" title="2-4" href="javascript:void(0);" coords="418,66,428,71,420,109,410,108" shape="poly" onclick="showInfo('2-4', event);">
+        <area  alt="1-3" title="1-3" href="javascript:void(0);" coords="426,26,425,34,354,39,354,27" shape="poly" onclick="showInfo('1-3', event);">
+        <area  alt="2-5" title="2-5" href="javascript:void(0);" coords="422,62,418,76,356,70,357,58" shape="poly" onclick="showInfo('2-5', event);">
+        <area  alt="3-5" title="3-5" href="javascript:void(0);" coords="350,28,358,28,359,66,350,66" shape="poly" onclick="showInfo('3-5', event);">
+        <area  alt="3-6" title="3-6" href="javascript:void(0);" coords="350,27,351,39,258,43,254,30" shape="poly" onclick="showInfo('3-6', event);">
+        <area  alt="4-10" title="4-10" href="javascript:void(0);" coords="411,109,418,111,403,174,356,170,360,158,399,161" shape="poly" onclick="showInfo('4-10', event);">
+        <area  alt="4-7" title="4-7" href="javascript:void(0);" coords="420,112,421,103,358,98,356,107" shape="poly" onclick="showInfo('4-7', event);">
+        <area  alt="5-7" title="5-7" href="javascript:void(0);" coords="350,64,360,66,360,104,351,106" shape="poly" onclick="showInfo('5-7', event);">
+        <area  alt="5-8" title="5-8" href="javascript:void(0);" coords="353,61,353,72,260,79,260,67" shape="poly" onclick="showInfo('5-8', event);">
+        <area  alt="6-8" title="6-8" href="javascript:void(0);" coords="248,34,256,30,262,75,254,76" shape="poly" onclick="showInfo('6-8', event);">
+        <area  alt="6-9" title="6-9" href="javascript:void(0);" coords="251,31,250,42,174,27,173,12" shape="poly" onclick="showInfo('6-9', event);">
+        <area  alt="7-10" title="7-10" href="javascript:void(0);" coords="350,102,359,103,363,171,354,172" shape="poly" onclick="showInfo('7-10', event);">
+        <area  alt="7-11" title="7-11" href="javascript:void(0);" coords="352,98,354,110,264,112,264,102" shape="poly" onclick="showInfo('7-11', event);">
+        <area  alt="8-11" title="8-11" href="javascript:void(0);" coords="254,72,263,73,269,109,259,109" shape="poly" onclick="showInfo('8-11', event);">
+        <area  alt="8-12" title="8-12" href="javascript:void(0);" coords="258,68,258,78,209,79,207,70" shape="poly" onclick="showInfo('8-1', event);">
+        <area  alt="9-12" title="9-12" href="javascript:void(0);" coords="174,15,165,14,202,76,214,72" shape="poly" onclick="showInfo('9-12', event);">
+        <area  alt="9-15" title="9-15" href="javascript:void(0);" coords="168,18,178,18,177,73,166,74" shape="poly" onclick="showInfo('9-15', event);">
+        <area  alt="9-16" title="9-16" href="javascript:void(0);" coords="177,14,177,24,112,18,114,10" shape="poly" onclick="showInfo('9-16', event);">
+        <area  alt="11-13" title="11-13" href="javascript:void(0);" coords="262,110,270,108,278,164,271,165" shape="poly" onclick="showInfo('11-13', event);">
+        <area  alt="10-13" title="10-13" href="javascript:void(0);" coords="356,160,358,169,274,166,274,155" shape="poly" onclick="showInfo('10-13', event);">
+        <area  alt="11-14" title="11-14" href="javascript:void(0);" coords="263,102,265,110,226,114,224,105" shape="poly" onclick="showInfo('11-14', event);">
+        <area  alt="12-14" title="12-14" href="javascript:void(0);" coords="202,74,213,70,229,111,221,111" shape="poly" onclick="showInfo('12-14', event);">
+        <area  alt="12-15" title="12-15" href="javascript:void(0);" coords="204,70,210,81,170,78,169,68" shape="poly" onclick="showInfo('12-15', event);">
+        <area  alt="13-17" title="13-17" href="javascript:void(0);" coords="272,155,273,167,233,170,231,161" shape="poly" onclick="showInfo('13-17', event);">
+        <area  alt="14-17" title="14-17" href="javascript:void(0);" coords="219,111,229,110,239,166,230,168" shape="poly" onclick="showInfo('14-17', event);">
+        <area  alt="14-18" title="14-18" href="javascript:void(0);" coords="222,104,225,116,166,111,166,100" shape="poly" onclick="showInfo('14-18', event);">
+        <area  alt="15-18" title="15-18" href="javascript:void(0);" coords="165,67,174,69,174,109,164,108" shape="poly" onclick="showInfo('15-18', event);">
+        <area  alt="15-19" title="15-19" href="javascript:void(0);" coords="167,67,169,78,111,70,109,57" shape="poly" onclick="showInfo('15-19', event);">
+        <area  alt="16-19" title="16-19" href="javascript:void(0);" coords="107,8,115,9,116,67,106,65" shape="poly" onclick="showInfo('16-19', event);">
+        <area  alt="16-25" title="16-25" href="javascript:void(0);" coords="109,19,112,8,1,-1,1,53,10,54,10,12" shape="poly" onclick="showInfo('16-25', event);">
+        <area  alt="17-20" title="17-20" href="javascript:void(0);" coords="229,159,232,169,167,170,168,160" shape="poly" onclick="showInfo('17-20', event);">
+        <area  alt="18-20" title="18-20" href="javascript:void(0);" coords="164,105,173,107,171,170,162,170" shape="poly" onclick="showInfo('18-20', event);">
+        <area  alt="18-21" title="18-21" href="javascript:void(0);" coords="165,99,165,109,106,103,105,90" shape="poly" onclick="showInfo('18-21', event);">
+        <area  alt="19-21" title="19-21" href="javascript:void(0);" coords="103,58,112,59,111,102,104,101" shape="poly" onclick="showInfo('19-21', event);">
+        <area  alt="19-22" title="19-22" href="javascript:void(0);" coords="106,58,107,68,62,64,62,52" shape="poly" onclick="showInfo('19-22', event);">
+        <area  alt="20-23" title="20-23" href="javascript:void(0);" coords="165,160,165,171,109,171,112,162" shape="poly" onclick="showInfo('20-23', event);">
+        <area  alt="21-23" title="21-23" href="javascript:void(0);" coords="104,100,111,100,113,172,105,172" shape="poly" onclick="showInfo('21-23', event);">
+        <area  alt="21-24" title="21-24" href="javascript:void(0);" coords="107,92,106,103,72,104,69,93" shape="poly" onclick="showInfo('21-24', event);">
+        <area  alt="22-24" title="22-24" href="javascript:void(0);" coords="60,53,69,55,75,102,67,103" shape="poly" onclick="showInfo('22-24', event);">
+        <area  alt="22-25" title="22-25" href="javascript:void(0);" coords="62,53,64,62,3,58,2,48" shape="poly" onclick="showInfo('22-25', event);">
+        <area  alt="23-26" title="23-26" href="javascript:void(0);" coords="109,170,109,163,80,163,81,172" shape="poly" onclick="showInfo('23-26', event);">
+        <area  alt="24-26" title="24-26" href="javascript:void(0);" coords="67,99,74,99,82,172,74,174" shape="poly" onclick="showInfo('24-26', event);">
+        <area  alt="25-27" title="25-27" href="javascript:void(0);" coords="1,52,10,53,14,102,6,102" shape="poly" onclick="showInfo('25-27', event);">
+        <area  alt="26-28" title="26-28" href="javascript:void(0);" coords="77,164,78,174,31,176,29,166" shape="poly" onclick="showInfo('26-28', event);">
+        <area  alt="27-28" title="27-28" href="javascript:void(0);" coords="4,99,17,98,26,165,37,164,36,176,13,177" shape="poly" onclick="showInfo('27-28', event);">
+        <area  alt="24-27" title="24-27" href="javascript:void(0);" coords="68,97,69,106,11,103,8,94" shape="poly" onclick="showInfo('24-27', event);">
+    </map>
 </body>
 </html>
